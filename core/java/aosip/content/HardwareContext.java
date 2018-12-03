@@ -54,7 +54,7 @@ public final class HardwareContext {
          * {@link PackageManager#hasSystemFeature}: The device includes the
          * hardware feature framework service.
          */
-        public static final String HARDWARE_AOSIP = "hardware.aosip";
+        public static final String HARDWARE_AOSIP = "hardware.aosip.controllers";
 
     }
 }
