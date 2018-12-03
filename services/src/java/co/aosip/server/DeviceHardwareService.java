@@ -1,0 +1,133 @@
+/*
+ * Copyright (C) 2015-2016 The CyanogenMod Project
+ *               2017-2018 The LineageOS Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package co.aosip.server;
+
+import android.content.Context;
+import android.content.Intent;
+import android.Manifest;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.os.UserHandle;
+import android.util.Log;
+
+import aosip.content.HardwareContext;
+import aosip.content.HardwareIntent;
+import aosip.hardware.IDeviceHardwareService;
+
+import com.android.server.HwSystemService;
+
+/** @hide */
+public class DeviceHardwareService extends HwSystemService {
+
+    private static final String TAG = DeviceHardwareService.class.getSimpleName();
+
+    private final Context mContext;
+    private final HardwareInterface mHwImpl;
+
+    private interface HardwareInterface {
+        public int getSupportedFeatures();
+        public boolean get(int feature);
+        public boolean set(int feature, boolean enable);
+    }
+
+    private class LegacyHardware implements HardwareInterface {
+
+        private int mSupportedFeatures = 0;
+
+        public LegacyHardware() {
+        }
+
+        public int getSupportedFeatures() {
+            return mSupportedFeatures;
+        }
+
+        public boolean get(int feature) {
+            return false;
+        }
+
+        public boolean set(int feature, boolean enable) {
+            return false;
+        }
+    }
+
+    private HardwareInterface getImpl(Context context) {
+        return new LegacyHardware();
+    }
+
+    public DeviceHardwareService(Context context) {
+        super(context);
+        mContext = context;
+        mHwImpl = getImpl(context);
+        publishBinderService(HardwareContext.DEVICE_HARDWARE_SERVICE, mService);
+    }
+
+    @Override
+    public String getHardwareFeatures() {
+        return HardwareContext.Features.HARDWARE_AOSIP;
+    }
+
+    @Override
+    public void onBootPhase(int phase) {
+        if (phase == PHASE_BOOT_COMPLETED) {
+            Intent intent = new Intent(HardwareIntent.ACTION_INITIALIZE_DEVICE_HARDWARE);
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+            mContext.sendBroadcastAsUser(intent, UserHandle.ALL,
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS);
+        }
+    }
+
+    @Override
+    public void onStart() {
+    }
+
+    private final IBinder mService = new IDeviceHardwareService.Stub() {
+
+        private boolean isSupported(int feature) {
+            return (getSupportedFeatures() & feature) == feature;
+        }
+
+        @Override
+        public int getSupportedFeatures() {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            return mHwImpl.getSupportedFeatures();
+        }
+
+        @Override
+        public boolean get(int feature) {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(feature)) {
+                Log.e(TAG, "feature " + feature + " is not supported");
+                return false;
+            }
+            return mHwImpl.get(feature);
+        }
+
+        @Override
+        public boolean set(int feature, boolean enable) {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(feature)) {
+                Log.e(TAG, "feature " + feature + " is not supported");
+                return false;
+            }
+            return mHwImpl.set(feature, enable);
+        }
+
+    };
+}
