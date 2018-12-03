@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <feature name="hardware.aosip.controllers" />
+    <library name="hardware.aosip.controllers"
+            file="/system/framework/hardware.aosip.controllers.jar" />
+</permissions>

@@ -24,4 +24,10 @@ interface IDeviceHardwareService {
     int getSupportedFeatures();
     boolean get(int feature);
     boolean set(int feature, boolean enable);
+
+    int[] getDisplayModes();
+    int getCurrentDisplayMode();
+    int getDefaultDisplayMode();
+    boolean setDisplayMode(in int mode, boolean makeDefault);
+    String getDisplayModeName(in int mode);
 }

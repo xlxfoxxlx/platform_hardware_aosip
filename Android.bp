@@ -27,6 +27,7 @@ java_library_static {
 
     libs: [
         "services.core",
+        "hardware.aosip.controllers",
     ] + hardware_aosip_LOCAL_JAVA_LIBRARIES,
 
     srcs: [
@@ -39,4 +40,9 @@ java_library_static {
     aidl: {
         local_include_dirs: [path_core],
     },
+}
+
+java_library {
+    name: "hardware.aosip.controllers",
+    srcs: ["src//**/*.java"],
 }

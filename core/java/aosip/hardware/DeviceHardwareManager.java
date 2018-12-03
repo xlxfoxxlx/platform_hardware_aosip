@@ -25,6 +25,8 @@ import android.util.Log;
 
 import aosip.content.HardwareContext;
 
+import com.android.internal.annotations.VisibleForTesting;
+
 import java.lang.IllegalArgumentException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -48,6 +50,12 @@ public final class DeviceHardwareManager {
     private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList();
 
     private static DeviceHardwareManager sDeviceHardwareManagerInstance;
+
+    /**
+     * DisplayEngine (DisplayModes)
+     */
+    @VisibleForTesting
+    public static final int FEATURE_DISPLAY_ENGINE = 0x1;
 
     /**
      * @hide to prevent subclassing from outside of the framework
@@ -183,6 +191,71 @@ public final class DeviceHardwareManager {
         } catch (RemoteException e) {
         }
         return false;
+    }
+
+    /**
+     * @return a list of available display modes on the devices
+     */
+    public int[] getDisplayModes() {
+        try {
+            if (checkService()) {
+                return sService.getDisplayModes();
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
+    }
+
+    /**
+     * @return the currently active display mode
+     */
+    public int getCurrentDisplayMode() {
+        try {
+            if (checkService()) {
+                return sService.getCurrentDisplayMode();
+            }
+        } catch (RemoteException e) {
+        }
+        return -1;
+    }
+
+    /**
+     * @return the default display mode to be set on boot
+     */
+    public int getDefaultDisplayMode() {
+        try {
+            if (checkService()) {
+                return sService.getDefaultDisplayMode();
+            }
+        } catch (RemoteException e) {
+        }
+        return -1;
+    }
+
+    /**
+     * @return true if setting the mode was successful
+     */
+    public boolean setDisplayMode(int mode, boolean makeDefault) {
+        try {
+            if (checkService()) {
+                return sService.setDisplayMode(mode, makeDefault);
+            }
+        } catch (RemoteException e) {
+        }
+        return false;
+    }
+
+    /**
+     * @return the name of the display mode
+     */
+    public String getDisplayModeName(int mode) {
+        try {
+            if (checkService()) {
+                return sService.getDisplayModeName(mode);
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
     }
 
     /**
