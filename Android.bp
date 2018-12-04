@@ -1,3 +1,4 @@
+
 //
 // Copyright (C) 2018 CypherOS
 //
@@ -21,12 +22,11 @@ hardware_aosip_LOCAL_JAVA_LIBRARIES = [
     "android-support-annotations",
 ]
 
-java_library_static {
-    name: "hardware.aosip",
-    required: ["services"],
+java_library {
+    name: "hardware.aosip.core",
 
     libs: [
-        "services.core",
+        "services",
         "hardware.aosip.controllers",
     ] + hardware_aosip_LOCAL_JAVA_LIBRARIES,
 
@@ -42,7 +42,27 @@ java_library_static {
     },
 }
 
+java_library_static {
+    name: "hardware.aosip",
+    required: ["services"],
+    libs: hardware_aosip_LOCAL_JAVA_LIBRARIES,
+
+    srcs: [
+        path_core + "/**/*.java",
+        path_core + "/**/I*.aidl",
+    ],
+
+    aidl: {
+        local_include_dirs: [path_core],
+    },
+}
+
 java_library {
     name: "hardware.aosip.controllers",
     srcs: ["src//**/*.java"],
+
+    libs: [
+        "hardware.aosip",
+        "services",
+    ],
 }
