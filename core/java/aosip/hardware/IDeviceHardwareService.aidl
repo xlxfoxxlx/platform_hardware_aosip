@@ -30,4 +30,6 @@ interface IDeviceHardwareService {
     int getDefaultDisplayMode();
     boolean setDisplayMode(in int mode, boolean makeDefault);
     String getDisplayModeName(in int mode);
+
+    boolean setFingerprintNavigation(in boolean canUse);
 }

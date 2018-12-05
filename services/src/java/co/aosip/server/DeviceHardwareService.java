@@ -32,6 +32,7 @@ import aosip.hardware.DeviceHardwareManager;
 import aosip.hardware.IDeviceHardwareService;
 
 import co.aosip.hwcontrollers.DisplayEngineController;
+import co.aosip.hwcontrollers.FingerprintNavigationController;
 
 import com.android.server.HwSystemService;
 
@@ -56,6 +57,9 @@ public class DeviceHardwareService extends HwSystemService {
         public int getDefaultDisplayMode();
         public boolean setDisplayMode(int mode, boolean makeDefault);
         public String getDisplayModeName(int mode);
+
+        // Fingerprint Navigation
+        public boolean setFingerprintNavigation(boolean canUse);
     }
 
     private class LegacyHardware implements HardwareInterface {
@@ -65,6 +69,8 @@ public class DeviceHardwareService extends HwSystemService {
         public LegacyHardware() {
             if (DisplayEngineController.isSupported())
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_DISPLAY_ENGINE;
+            if (FingerprintNavigationController.isSupported())
+                mSupportedFeatures |= DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION;
         }
 
         public int getSupportedFeatures() {
@@ -97,6 +103,10 @@ public class DeviceHardwareService extends HwSystemService {
 
         public String getDisplayModeName(int mode) {
             return DisplayEngineController.getModeName(mode);
+        }
+
+        public boolean setFingerprintNavigation(boolean canUse) {
+            return FingerprintNavigationController.setEnabled(canUse);
         }
     }
 
@@ -218,6 +228,17 @@ public class DeviceHardwareService extends HwSystemService {
                 return null;
             }
             return mHwImpl.getDisplayModeName(mode);
+        }
+
+        @Override
+        public boolean setFingerprintNavigation(boolean canUse) {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION)) {
+                Log.e(TAG, "Fingerprint navigation is not supported");
+                return false;
+            }
+            return mHwImpl.setFingerprintNavigation(canUse);
         }
     };
 }

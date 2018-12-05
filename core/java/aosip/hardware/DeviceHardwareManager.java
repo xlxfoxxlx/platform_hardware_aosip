@@ -58,6 +58,12 @@ public final class DeviceHardwareManager {
     public static final int FEATURE_DISPLAY_ENGINE = 0x1;
 
     /**
+     * Fingerprint Navigation
+     */
+    @VisibleForTesting
+    public static final int FEATURE_FINGERPRINT_NAVIGATION = 0x2;
+
+    /**
      * @hide to prevent subclassing from outside of the framework
      */
     private DeviceHardwareManager(Context context) {
@@ -256,6 +262,19 @@ public final class DeviceHardwareManager {
         } catch (RemoteException e) {
         }
         return null;
+    }
+
+    /**
+     * @return the status of the fingerprint navigation
+     */
+    public boolean setFingerprintNavigation(boolean canUse) {
+        try {
+            if (checkService()) {
+                return sService.setFingerprintNavigation(canUse);
+            }
+        } catch (RemoteException e) {
+        }
+        return false;
     }
 
     /**
