@@ -25,12 +25,14 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import aosip.content.HardwareContext;
 import aosip.content.HardwareIntent;
 import aosip.hardware.DeviceHardwareManager;
 import aosip.hardware.IDeviceHardwareService;
 
+import co.aosip.hwcontrollers.AlertSliderController;
 import co.aosip.hwcontrollers.DisplayEngineController;
 import co.aosip.hwcontrollers.FingerprintNavigationController;
 
@@ -60,6 +62,10 @@ public class DeviceHardwareService extends HwSystemService {
 
         // Fingerprint Navigation
         public boolean setFingerprintNavigation(boolean canUse);
+
+        // Alert Slider
+        public boolean triStateReady(Context context);
+        public KeyEvent handleTriStateEvent(KeyEvent event);
     }
 
     private class LegacyHardware implements HardwareInterface {
@@ -71,6 +77,8 @@ public class DeviceHardwareService extends HwSystemService {
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_DISPLAY_ENGINE;
             if (FingerprintNavigationController.isSupported())
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION;
+            if (AlertSliderController.isSupported())
+                mSupportedFeatures |= DeviceHardwareManager.FEATURE_ALERT_SLIDER;
         }
 
         public int getSupportedFeatures() {
@@ -107,6 +115,14 @@ public class DeviceHardwareService extends HwSystemService {
 
         public boolean setFingerprintNavigation(boolean canUse) {
             return FingerprintNavigationController.setEnabled(canUse);
+        }
+
+        public boolean triStateReady(Context context) {
+            return AlertSliderController.triStateReady(context);
+        }
+
+        public KeyEvent handleTriStateEvent(KeyEvent event) {
+            return AlertSliderController.handleTriStateEvent(event);
         }
     }
 
@@ -239,6 +255,28 @@ public class DeviceHardwareService extends HwSystemService {
                 return false;
             }
             return mHwImpl.setFingerprintNavigation(canUse);
+        }
+
+        @Override
+        public boolean triStateReady() {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(DeviceHardwareManager.FEATURE_ALERT_SLIDER)) {
+                Log.e(TAG, "Alert slider is not supported");
+                return false;
+            }
+            return mHwImpl.triStateReady(mContext);
+        }
+
+        @Override
+        public KeyEvent handleTriStateEvent(KeyEvent event) {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(DeviceHardwareManager.FEATURE_ALERT_SLIDER)) {
+                Log.e(TAG, "Alert slider is not supported");
+                return null;
+            }
+            return mHwImpl.handleTriStateEvent(event);
         }
     };
 }

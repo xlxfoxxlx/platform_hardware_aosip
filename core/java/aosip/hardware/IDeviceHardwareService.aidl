@@ -18,6 +18,8 @@
 
 package aosip.hardware;
 
+import android.view.KeyEvent;
+
 /** @hide */
 interface IDeviceHardwareService {
 
@@ -32,4 +34,7 @@ interface IDeviceHardwareService {
     String getDisplayModeName(in int mode);
 
     boolean setFingerprintNavigation(in boolean canUse);
+
+    boolean triStateReady();
+    KeyEvent handleTriStateEvent(in KeyEvent event);
 }
