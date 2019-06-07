@@ -73,7 +73,7 @@ public class DeviceHardwareService extends HwSystemService {
 
         public LegacyHardware() {
             if (DisplayEngineController.isSupported())
-                mSupportedFeatures |= DeviceHardwareManager.FEATURE_DISPLAY_ENGINE;
+                mSupportedFeatures |= DeviceHardwareManager.FEATURE_DISPLAY_MODES;
             if (FingerprintNavigationController.isSupported())
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION;
             if (AlertSliderController.isSupported())
@@ -190,7 +190,7 @@ public class DeviceHardwareService extends HwSystemService {
         public DisplayMode[] getDisplayModes() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
-            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
+            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
                 return null;
             }
@@ -201,7 +201,7 @@ public class DeviceHardwareService extends HwSystemService {
         public DisplayMode getCurrentDisplayMode() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
-            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
+            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
                 return -1;
             }
@@ -212,7 +212,7 @@ public class DeviceHardwareService extends HwSystemService {
         public DisplayMode getDefaultDisplayMode() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
-            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
+            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
                 return -1;
             }
@@ -223,7 +223,7 @@ public class DeviceHardwareService extends HwSystemService {
         public boolean setDisplayMode(int mode, boolean makeDefault) {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
-            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
+            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
                 return false;
             }

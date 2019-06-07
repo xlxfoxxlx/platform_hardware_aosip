@@ -23,6 +23,7 @@ hardware_aosip_LOCAL_JAVA_LIBRARIES = [
 ]
 
 hardware_aosip_LOCAL_STATIC_JAVA_LIBRARIES = [
+    "vendor.aosip.displayengine-V1.0-java",
     "vendor.aosip.touch-V1.0-java",
 ]
 
