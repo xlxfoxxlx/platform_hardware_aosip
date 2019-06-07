@@ -20,6 +20,8 @@ package aosip.hardware;
 
 import android.view.KeyEvent;
 
+import aoscp.hardware.DisplayMode;
+
 /** @hide */
 interface IDeviceHardwareService {
 
@@ -27,11 +29,10 @@ interface IDeviceHardwareService {
     boolean get(int feature);
     boolean set(int feature, boolean enable);
 
-    int[] getDisplayModes();
-    int getCurrentDisplayMode();
-    int getDefaultDisplayMode();
+    DisplayMode[] getDisplayModes();
+    DisplayMode getCurrentDisplayMode();
+    DisplayMode getDefaultDisplayMode();
     boolean setDisplayMode(in int mode, boolean makeDefault);
-    String getDisplayModeName(in int mode);
 
     boolean setFingerprintNavigation(in boolean canUse);
 

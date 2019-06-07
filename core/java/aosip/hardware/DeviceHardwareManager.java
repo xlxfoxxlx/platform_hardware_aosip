@@ -246,7 +246,7 @@ public final class DeviceHardwareManager {
     /**
      * @return a list of available display modes on the devices
      */
-    public int[] getDisplayModes() {
+    public DisplayMode[] getDisplayModes() {
         try {
             if (checkService()) {
                 return sService.getDisplayModes();
@@ -259,7 +259,7 @@ public final class DeviceHardwareManager {
     /**
      * @return the currently active display mode
      */
-    public int getCurrentDisplayMode() {
+    public DisplayMode getCurrentDisplayMode() {
         try {
             if (checkService()) {
                 return sService.getCurrentDisplayMode();
@@ -272,7 +272,7 @@ public final class DeviceHardwareManager {
     /**
      * @return the default display mode to be set on boot
      */
-    public int getDefaultDisplayMode() {
+    public DisplayMode getDefaultDisplayMode() {
         try {
             if (checkService()) {
                 return sService.getDefaultDisplayMode();
@@ -293,19 +293,6 @@ public final class DeviceHardwareManager {
         } catch (RemoteException e) {
         }
         return false;
-    }
-
-    /**
-     * @return the name of the display mode
-     */
-    public String getDisplayModeName(int mode) {
-        try {
-            if (checkService()) {
-                return sService.getDisplayModeName(mode);
-            }
-        } catch (RemoteException e) {
-        }
-        return null;
     }
 
     /**

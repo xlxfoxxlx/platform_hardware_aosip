@@ -54,11 +54,10 @@ public class DeviceHardwareService extends HwSystemService {
         public boolean set(int feature, boolean enable);
 
         // DisplayEngine
-        public int[] getDisplayModes();
-        public int getCurrentDisplayMode();
-        public int getDefaultDisplayMode();
+        public DisplayMode[] getDisplayModes();
+        public DisplayMode getCurrentDisplayMode();
+        public DisplayMode getDefaultDisplayMode();
         public boolean setDisplayMode(int mode, boolean makeDefault);
-        public String getDisplayModeName(int mode);
 
         // Fingerprint Navigation
         public boolean setFingerprintNavigation(boolean canUse);
@@ -93,24 +92,20 @@ public class DeviceHardwareService extends HwSystemService {
             return false;
         }
 
-        public int[] getDisplayModes() {
+        public DisplayMode[] getDisplayModes() {
             return DisplayEngineController.getAvailableModes();
         }
 
-        public int getCurrentDisplayMode() {
+        public DisplayMode getCurrentDisplayMode() {
             return DisplayEngineController.getCurrentMode();
         }
 
-        public int getDefaultDisplayMode() {
+        public DisplayMode getDefaultDisplayMode() {
             return DisplayEngineController.getDefaultMode();
         }
 
         public boolean setDisplayMode(int mode, boolean makeDefault) {
             return DisplayEngineController.setMode(mode, makeDefault);
-        }
-
-        public String getDisplayModeName(int mode) {
-            return DisplayEngineController.getModeName(mode);
         }
 
         public boolean setFingerprintNavigation(boolean canUse) {
@@ -192,7 +187,7 @@ public class DeviceHardwareService extends HwSystemService {
         }
 
         @Override
-        public int[] getDisplayModes() {
+        public DisplayMode[] getDisplayModes() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
@@ -203,7 +198,7 @@ public class DeviceHardwareService extends HwSystemService {
         }
 
         @Override
-        public int getCurrentDisplayMode() {
+        public DisplayMode getCurrentDisplayMode() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
@@ -214,7 +209,7 @@ public class DeviceHardwareService extends HwSystemService {
         }
 
         @Override
-        public int getDefaultDisplayMode() {
+        public DisplayMode getDefaultDisplayMode() {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
@@ -233,17 +228,6 @@ public class DeviceHardwareService extends HwSystemService {
                 return false;
             }
             return mHwImpl.setDisplayMode(mode, makeDefault);
-        }
-
-        @Override
-        public String getDisplayModeName(int mode) {
-            mContext.enforceCallingOrSelfPermission(
-                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
-            if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_ENGINE)) {
-                Log.e(TAG, "Display modes are not supported");
-                return null;
-            }
-            return mHwImpl.getDisplayModeName(mode);
         }
 
         @Override

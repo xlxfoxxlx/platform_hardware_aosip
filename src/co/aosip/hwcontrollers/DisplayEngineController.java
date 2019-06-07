@@ -20,6 +20,8 @@ package co.aosip.hwcontrollers;
 
 import android.util.Log;
 
+import aoscp.hardware.DisplayMode;
+
 /*
  * DisplayEngine API
  *
@@ -49,16 +51,16 @@ public class DisplayEngineController {
      * It is the responsibility of the upper layers to
      * map the name to a human-readable format or perform translation.
      */
-    public static int[] getAvailableModes() {
-        return new int[0];
+    public static DisplayMode[] getAvailableModes() {
+        return new DisplayMode[0];
     }
 
     /*
      * Get the name of the currently selected mode. This can return
      * null if no mode is selected.
      */
-    public static int getCurrentMode() {
-        return -1;
+    public static DisplayMode getCurrentMode() {
+        return null;
     }
 
     /*
@@ -75,15 +77,7 @@ public class DisplayEngineController {
      * Gets the preferred default mode for this device by it's
      * string identifier. Can return null if there is no default.
      */
-    public static int getDefaultMode() {
-        return -1;
-    }
-
-    /*
-     * Gets the name of the selected mode.
-     * mode: returns the current mode by int
-     */
-    public static String getModeName(int mode) {
+    public static DisplayMode getDefaultMode() {
         return null;
     }
 }
