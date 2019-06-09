@@ -32,7 +32,7 @@ interface IDeviceHardwareService {
     DisplayMode[] getDisplayModes();
     DisplayMode getCurrentDisplayMode();
     DisplayMode getDefaultDisplayMode();
-    boolean setDisplayMode(in int mode, boolean makeDefault);
+    boolean setDisplayMode(in DisplayMode mode, boolean makeDefault);
 
     boolean setFingerprintNavigation(in boolean canUse);
 

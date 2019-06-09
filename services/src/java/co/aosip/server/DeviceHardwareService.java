@@ -30,6 +30,7 @@ import android.view.KeyEvent;
 import aosip.content.HardwareContext;
 import aosip.content.HardwareIntent;
 import aosip.hardware.DeviceHardwareManager;
+import aosip.hardware.DisplayMode;
 import aosip.hardware.IDeviceHardwareService;
 
 import co.aosip.hwcontrollers.AlertSliderController;
@@ -57,7 +58,7 @@ public class DeviceHardwareService extends HwSystemService {
         public DisplayMode[] getDisplayModes();
         public DisplayMode getCurrentDisplayMode();
         public DisplayMode getDefaultDisplayMode();
-        public boolean setDisplayMode(int mode, boolean makeDefault);
+        public boolean setDisplayMode(DisplayMode mode, boolean makeDefault);
 
         // Fingerprint Navigation
         public boolean setFingerprintNavigation(boolean canUse);
@@ -104,7 +105,7 @@ public class DeviceHardwareService extends HwSystemService {
             return DisplayEngineController.getDefaultMode();
         }
 
-        public boolean setDisplayMode(int mode, boolean makeDefault) {
+        public boolean setDisplayMode(DisplayMode mode, boolean makeDefault) {
             return DisplayEngineController.setMode(mode, makeDefault);
         }
 
@@ -203,7 +204,7 @@ public class DeviceHardwareService extends HwSystemService {
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
-                return -1;
+                return null;
             }
             return mHwImpl.getCurrentDisplayMode();
         }
@@ -214,13 +215,13 @@ public class DeviceHardwareService extends HwSystemService {
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {
                 Log.e(TAG, "Display modes are not supported");
-                return -1;
+                return null;
             }
             return mHwImpl.getDefaultDisplayMode();
         }
 
         @Override
-        public boolean setDisplayMode(int mode, boolean makeDefault) {
+        public boolean setDisplayMode(DisplayMode mode, boolean makeDefault) {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
             if (!isSupported(DeviceHardwareManager.FEATURE_DISPLAY_MODES)) {

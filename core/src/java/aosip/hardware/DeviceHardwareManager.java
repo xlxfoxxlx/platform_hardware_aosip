@@ -22,6 +22,7 @@ import android.hidl.base.V1_0.IBase;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -32,6 +33,7 @@ import com.android.internal.annotations.VisibleForTesting;
 import java.lang.IllegalArgumentException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -52,6 +54,8 @@ public final class DeviceHardwareManager {
     private static final String TAG = "DeviceHardwareManager";
 
     private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList();
+    private final ArrayMap<String, String> mDisplayModeMappings = new ArrayMap<String, String>();
+    private final boolean mFilterDisplayModes;
 
     private Context mContext;
     private static IDeviceHardwareService sService;
@@ -96,6 +100,19 @@ public final class DeviceHardwareManager {
                     " crashed, was not started, or the interface has been called too early in" +
                     " SystemServer init");
         }
+
+        final String[] mappings = mContext.getResources().getStringArray(
+                com.android.internal.R.array.config_displayModeMappings);
+        if (mappings != null && mappings.length > 0) {
+            for (String mapping : mappings) {
+                String[] split = mapping.split(":");
+                if (split.length == 2) {
+                    mDisplayModeMappings.put(split[0], split[1]);
+                }
+            }
+        }
+        mFilterDisplayModes = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_filterDisplayModes);
     }
 
     /**
@@ -177,7 +194,7 @@ public final class DeviceHardwareManager {
             switch (feature) {
                 case FEATURE_FINGERPRINT_NAVIGATION:
                     return IFingerprintNavigation.getService(true);
-				case FEATURE_DISPLAY_MODES:
+                case FEATURE_DISPLAY_MODES:
                     return IDisplayModes.getService(true);
             }
         } catch (NoSuchElementException | RemoteException e) {
@@ -206,9 +223,6 @@ public final class DeviceHardwareManager {
                     case FEATURE_FINGERPRINT_NAVIGATION:
                         IFingerprintNavigation fingerprintNav = (IFingerprintNavigation) obj;
                         return fingerprintNav.isSupported();
-					case FEATURE_DISPLAY_MODES:
-                        IDisplayModes dm = (IDisplayModes) obj;
-                        return dm.isSupported();
                 }
             } else if (checkService()) {
                 return sService.get(feature);
@@ -253,68 +267,94 @@ public final class DeviceHardwareManager {
      * @return a list of available display modes on the devices
      */
     public DisplayMode[] getDisplayModes() {
+        DisplayMode[] modes = null;
         try {
             if (isSupportedHIDL(FEATURE_DISPLAY_MODES)) {
-                IDisplayModes dm = (IDisplayModes)
-                        mHIDLMap.get(FEATURE_DISPLAY_MODES);
-                return dm.getDisplayModes();
+                IDisplayModes dm = (IDisplayModes) mHIDLMap.get(FEATURE_DISPLAY_MODES);
+                modes = HIDLHelper.fromHIDLModes(dm.getDisplayModes());
             } else if (checkService()) {
-                return sService.getDisplayModes();
+                modes = sService.getDisplayModes();
             }
         } catch (RemoteException e) {
+        } finally {
+            if (modes == null) {
+                return null;
+            }
+            final ArrayList<DisplayMode> remapped = new ArrayList<DisplayMode>();
+            for (DisplayMode mode : modes) {
+                DisplayMode r = remapDisplayMode(mode);
+                if (r != null) {
+                    remapped.add(r);
+                }
+            }
+            return remapped.toArray(new DisplayMode[0]);
         }
-        return null;
     }
 
     /**
      * @return the currently active display mode
      */
     public DisplayMode getCurrentDisplayMode() {
+        DisplayMode mode = null;
         try {
             if (isSupportedHIDL(FEATURE_DISPLAY_MODES)) {
-                IDisplayModes dm = (IDisplayModes)
-                        mHIDLMap.get(FEATURE_DISPLAY_MODES);
-                return dm.getCurrentDisplayMode();
+                IDisplayModes dm = (IDisplayModes) mHIDLMap.get(FEATURE_DISPLAY_MODES);
+                mode = HIDLHelper.fromHIDLMode(dm.getCurrentDisplayMode());
             } else if (checkService()) {
-                return sService.getCurrentDisplayMode();
+                mode = sService.getCurrentDisplayMode();
             }
         } catch (RemoteException e) {
+        } finally {
+            return mode != null ? remapDisplayMode(mode) : null;
         }
-        return -1;
     }
 
     /**
      * @return the default display mode to be set on boot
      */
     public DisplayMode getDefaultDisplayMode() {
+        DisplayMode mode = null;
         try {
             if (isSupportedHIDL(FEATURE_DISPLAY_MODES)) {
-                IDisplayModes dm = (IDisplayModes)
-                        mHIDLMap.get(FEATURE_DISPLAY_MODES);
-                return dm.getDefaultDisplayMode();
+                IDisplayModes dm = (IDisplayModes) mHIDLMap.get(FEATURE_DISPLAY_MODES);
+                mode = HIDLHelper.fromHIDLMode(dm.getDefaultDisplayMode());
             } else if (checkService()) {
-                return sService.getDefaultDisplayMode();
+                mode = sService.getDefaultDisplayMode();
             }
         } catch (RemoteException e) {
+        } finally {
+            return mode != null ? remapDisplayMode(mode) : null;
         }
-        return -1;
     }
 
     /**
      * @return true if setting the mode was successful
      */
-    public boolean setDisplayMode(int mode, boolean makeDefault) {
-		try {
+    public boolean setDisplayMode(DisplayMode mode, boolean makeDefault) {
+        try {
             if (isSupportedHIDL(FEATURE_DISPLAY_MODES)) {
                 IDisplayModes dm = (IDisplayModes)
                         mHIDLMap.get(FEATURE_DISPLAY_MODES);
-                return dm.setDisplayMode(mode, makeDefault);
+                return dm.setDisplayMode(mode.id, makeDefault);
             } else if (checkService()) {
                 return sService.setDisplayMode(mode, makeDefault);
             }
         } catch (RemoteException e) {
         }
         return false;
+    }
+
+    private DisplayMode remapDisplayMode(DisplayMode dm) {
+        if (dm == null) {
+            return null;
+        }
+        if (mDisplayModeMappings.containsKey(dm.name)) {
+            return new DisplayMode(dm.id, mDisplayModeMappings.get(dm.name));
+        }
+        if (!mFilterDisplayModes) {
+            return dm;
+        }
+        return null;
     }
 
     /**

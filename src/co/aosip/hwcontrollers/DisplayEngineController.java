@@ -69,7 +69,7 @@ public class DisplayEngineController {
      * failure. It is up to the implementation to determine
      * if this mode is valid.
      */
-    public static boolean setMode(int mode, boolean makeDefault) {
+    public static boolean setMode(DisplayMode mode, boolean makeDefault) {
         return false;
     }
 

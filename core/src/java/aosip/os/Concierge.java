@@ -56,7 +56,7 @@ public final class Concierge {
     /**
      * @hide
      */
-    public static final int PARCELABLE_VERSION = "pie";
+    public static final int PARCELABLE_VERSION = 7;
 
     /**
      * Tell the concierge to receive our parcel, so we can get information from it.
