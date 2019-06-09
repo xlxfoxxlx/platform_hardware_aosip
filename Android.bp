@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-path_core = "core/java/aosip"
+path_core = "core/src/java/aosip"
 path_services = "services/src/java/co/aosip/server"
 
 hardware_aosip_LOCAL_JAVA_LIBRARIES = [
@@ -44,7 +44,7 @@ java_library {
     ],
 
     aidl: {
-        local_include_dirs: [path_core],
+        local_include_dirs: ["core/src/java"],
     },
 }
 
@@ -60,7 +60,7 @@ java_library_static {
     ],
 
     aidl: {
-        local_include_dirs: [path_core],
+        local_include_dirs: ["core/src/java"],
     },
 }
 
