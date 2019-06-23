@@ -53,7 +53,6 @@ public final class DeviceHardwareManager {
 
     private static final String TAG = "DeviceHardwareManager";
 
-    private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList();
     private final ArrayMap<String, String> mDisplayModeMappings = new ArrayMap<String, String>();
     private final boolean mFilterDisplayModes;
 
@@ -81,6 +80,10 @@ public final class DeviceHardwareManager {
      */
     @VisibleForTesting
     public static final int FEATURE_ALERT_SLIDER = 0x3;
+
+    private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList(
+        FEATURE_FINGERPRINT_NAVIGATION
+    );
 
     /**
      * @hide to prevent subclassing from outside of the framework

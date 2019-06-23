@@ -86,7 +86,13 @@ public class DeviceHardwareService extends HwSystemService {
         }
 
         public boolean get(int feature) {
-            return false;
+            switch(feature) {
+                case DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION:
+                    return FingerprintNavigationController.isSupported();
+                default:
+                    Log.e(TAG, "feature " + feature + " is not a boolean feature");
+                    return false;
+            }
         }
 
         public boolean set(int feature, boolean enable) {
