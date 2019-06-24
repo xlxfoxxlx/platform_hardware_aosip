@@ -32,10 +32,12 @@ import aosip.content.HardwareIntent;
 import aosip.hardware.DeviceHardwareManager;
 import aosip.hardware.DisplayMode;
 import aosip.hardware.IDeviceHardwareService;
+import aosip.hardware.TouchscreenGesture;
 
 import co.aosip.hwcontrollers.AlertSliderController;
 import co.aosip.hwcontrollers.DisplayEngineController;
 import co.aosip.hwcontrollers.FingerprintNavigationController;
+import co.aosip.hwcontrollers.TouchscreenGestureController;
 
 import com.android.server.HwSystemService;
 
@@ -66,6 +68,10 @@ public class DeviceHardwareService extends HwSystemService {
         // Alert Slider
         public boolean triStateReady(Context context);
         public KeyEvent handleTriStateEvent(KeyEvent event);
+
+        // Touchscreen Gestures
+        public TouchscreenGesture[] getTouchscreenGestures();
+        public boolean setTouchscreenGestureEnabled(TouchscreenGesture gesture, boolean state);
     }
 
     private class LegacyHardware implements HardwareInterface {
@@ -79,6 +85,8 @@ public class DeviceHardwareService extends HwSystemService {
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_FINGERPRINT_NAVIGATION;
             if (AlertSliderController.isSupported())
                 mSupportedFeatures |= DeviceHardwareManager.FEATURE_ALERT_SLIDER;
+            if (TouchscreenGestureController.isSupported())
+                mSupportedFeatures |= DeviceHardwareManager.FEATURE_TOUCHSCREEN_GESTURES;
         }
 
         public int getSupportedFeatures() {
@@ -125,6 +133,14 @@ public class DeviceHardwareService extends HwSystemService {
 
         public KeyEvent handleTriStateEvent(KeyEvent event) {
             return AlertSliderController.handleTriStateEvent(event);
+        }
+
+        public TouchscreenGesture[] getTouchscreenGestures() {
+            return TouchscreenGestureController.getAvailableGestures();
+        }
+
+        public boolean setTouchscreenGestureEnabled(TouchscreenGesture gesture, boolean state) {
+            return TouchscreenGestureController.setGestureEnabled(gesture, state);
         }
     }
 
@@ -268,6 +284,28 @@ public class DeviceHardwareService extends HwSystemService {
                 return null;
             }
             return mHwImpl.handleTriStateEvent(event);
+        }
+
+        @Override
+        public TouchscreenGesture[] getTouchscreenGestures() {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(DeviceHardwareManager.FEATURE_TOUCHSCREEN_GESTURES)) {
+                Log.e(TAG, "Touchscreen gestures are not supported");
+                return null;
+            }
+            return mHwImpl.getTouchscreenGestures();
+        }
+
+        @Override
+        public boolean setTouchscreenGestureEnabled(TouchscreenGesture gesture, boolean state) {
+            mContext.enforceCallingOrSelfPermission(
+                    android.Manifest.permission.DEVICE_HARDWARE_ACCESS, null);
+            if (!isSupported(DeviceHardwareManager.FEATURE_TOUCHSCREEN_GESTURES)) {
+                Log.e(TAG, "Touchscreen gestures are not supported");
+                return false;
+            }
+            return mHwImpl.setTouchscreenGestureEnabled(gesture, state);
         }
     };
 }

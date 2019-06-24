@@ -40,6 +40,7 @@ import java.util.NoSuchElementException;
 
 import vendor.aosip.displayengine.V1_0.IDisplayModes;
 import vendor.aosip.touch.V1_0.IFingerprintNavigation;
+import vendor.aosip.touch.V1_0.ITouchscreenGesture;
 
 /**
  * Manages access to device hardware extensions
@@ -80,6 +81,12 @@ public final class DeviceHardwareManager {
      */
     @VisibleForTesting
     public static final int FEATURE_ALERT_SLIDER = 0x3;
+
+    /**
+     * Touchscreen gesture
+     */
+    @VisibleForTesting
+    public static final int FEATURE_TOUCHSCREEN_GESTURES = 0x4;
 
     private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList(
         FEATURE_FINGERPRINT_NAVIGATION
@@ -199,6 +206,8 @@ public final class DeviceHardwareManager {
                     return IFingerprintNavigation.getService(true);
                 case FEATURE_DISPLAY_MODES:
                     return IDisplayModes.getService(true);
+                case FEATURE_TOUCHSCREEN_GESTURES:
+                    return ITouchscreenGesture.getService(true);
             }
         } catch (NoSuchElementException | RemoteException e) {
         }
@@ -401,6 +410,42 @@ public final class DeviceHardwareManager {
         } catch (RemoteException e) {
         }
         return null;
+    }
+
+    /**
+     * @return a list of available touchscreen gestures on the devices
+     */
+    public TouchscreenGesture[] getTouchscreenGestures() {
+        try {
+            if (isSupportedHIDL(FEATURE_TOUCHSCREEN_GESTURES)) {
+                ITouchscreenGesture touchscreenGesture = (ITouchscreenGesture)
+                        mHIDLMap.get(FEATURE_TOUCHSCREEN_GESTURES);
+                return HIDLHelper.fromHIDLGestures(touchscreenGesture.getSupportedGestures());
+            } else if (checkService()) {
+                return sService.getTouchscreenGestures();
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
+    }
+
+    /**
+     * @return true if setting the activation status was successful
+     */
+    public boolean setTouchscreenGestureEnabled(
+            TouchscreenGesture gesture, boolean state) {
+        try {
+            if (isSupportedHIDL(FEATURE_TOUCHSCREEN_GESTURES)) {
+                ITouchscreenGesture touchscreenGesture = (ITouchscreenGesture)
+                        mHIDLMap.get(FEATURE_TOUCHSCREEN_GESTURES);
+                return touchscreenGesture.setGestureEnabled(
+                        HIDLHelper.toHIDLGesture(gesture), state);
+            } else if (checkService()) {
+                return sService.setTouchscreenGestureEnabled(gesture, state);
+            }
+        } catch (RemoteException e) {
+        }
+        return false;
     }
 
     /**

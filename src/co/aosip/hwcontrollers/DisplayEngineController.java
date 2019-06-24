@@ -20,7 +20,7 @@ package co.aosip.hwcontrollers;
 
 import android.util.Log;
 
-import aoscp.hardware.DisplayMode;
+import aosip.hardware.DisplayMode;
 
 /*
  * DisplayEngine API

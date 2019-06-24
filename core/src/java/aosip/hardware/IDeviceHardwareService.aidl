@@ -20,7 +20,8 @@ package aosip.hardware;
 
 import android.view.KeyEvent;
 
-import aoscp.hardware.DisplayMode;
+import aosip.hardware.DisplayMode;
+import aosip.hardware.TouchscreenGesture;
 
 /** @hide */
 interface IDeviceHardwareService {
@@ -38,4 +39,7 @@ interface IDeviceHardwareService {
 
     boolean triStateReady();
     KeyEvent handleTriStateEvent(in KeyEvent event);
+
+    TouchscreenGesture[] getTouchscreenGestures();
+    boolean setTouchscreenGestureEnabled(in TouchscreenGesture gesture, boolean state);
 }
