@@ -35,4 +35,13 @@ public class Intent {
      */
     public static final String ACTION_INITIALIZE_DEVICE_HARDWARE =
             "android.intent.action.INITIALIZE_DEVICE_HARDWARE";
+
+    /**
+     * Broadcast action: notify the system that the user has performed a gesture on the screen
+     * to launch the camera. Broadcast should be protected to receivers holding the
+     * {@link Manifest.permission#STATUS_BAR_SERVICE} permission.
+     * @hide
+     */
+    public static final String ACTION_SCREEN_CAMERA_GESTURE =
+            "aosip.intent.action.SCREEN_CAMERA_GESTURE";
 }
