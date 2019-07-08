@@ -21,9 +21,9 @@ package aosip.content;
 import android.Manifest;
 
 /**
- * CypherOS Hardware Intent Class.
+ * aosip/hw Intent Class.
  */
-public class HardwareIntent {
+public class Intent {
 
     /**
      * Broadcast action: Perform any initialization required for aosip hardware services.

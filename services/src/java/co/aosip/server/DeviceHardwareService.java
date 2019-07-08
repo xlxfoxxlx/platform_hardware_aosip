@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import aosip.content.HardwareContext;
-import aosip.content.HardwareIntent;
 import aosip.hardware.DeviceHardwareManager;
 import aosip.hardware.DisplayMode;
 import aosip.hardware.IDeviceHardwareService;
@@ -163,7 +162,7 @@ public class DeviceHardwareService extends HwSystemService {
     @Override
     public void onBootPhase(int phase) {
         if (phase == PHASE_BOOT_COMPLETED) {
-            Intent intent = new Intent(HardwareIntent.ACTION_INITIALIZE_DEVICE_HARDWARE);
+            Intent intent = new Intent(aosip.content.Intent.ACTION_INITIALIZE_DEVICE_HARDWARE);
             intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
             mContext.sendBroadcastAsUser(intent, UserHandle.ALL,
                     android.Manifest.permission.DEVICE_HARDWARE_ACCESS);
